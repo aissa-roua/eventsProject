@@ -1,5 +1,8 @@
 pipeline {
     agent any
+    environment {
+        IMAGE = 'rouaaissa26/events-project'
+    }
     stages {
         stage('Checkout') {
             steps { checkout scm }
