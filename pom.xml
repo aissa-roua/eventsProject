@@ -18,11 +18,18 @@
         <developerConnection>scm:svn:https://somerepository.com/svn_repo/trunk</developerConnection>
         <url>http://somerepository.com/view.cgi</url>
     </scm>
-    <properties>
-        <java.version>1.8</java.version>
+   <properties>
+    <java.version>17</java.version>
+    <lombok.version>1.18.30</lombok.version>
+    <sonar.projectKey>eventsProject</sonar.projectKey>
+    <sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
     </properties>
     <dependencies>
-
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -54,7 +61,16 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
+    <distributionManagement>
+    <repository>
+        <id>nexus</id>
+        <url>http://nexus:8081/repository/maven-releases/</url>
+    </repository>
+    <snapshotRepository>
+        <id>nexus</id>
+        <url>http://nexus:8081/repository/maven-snapshots/</url>
+    </snapshotRepository>
+    </distributionManagement>
     <build>
         <plugins>
             <plugin>
@@ -76,6 +92,19 @@
                 <configuration>
                     <tagNameFormat>v@{project.version}</tagNameFormat>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.11</version>
+                <executions>
+                    <execution><goals><goal>prepare-agent</goal></goals></execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>test</phase>
+                        <goals><goal>report</goal></goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
