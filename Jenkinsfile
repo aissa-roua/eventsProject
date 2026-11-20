@@ -1,0 +1,29 @@
+pipeline {
+    agent any
+    stages {
+        stage('Checkout') {
+            steps { checkout scm }
+        }
+        stage('Build') {
+            steps { sh 'chmod +x mvnw && ./mvnw clean package -DskipTests' }
+        }
+        stage('Tests JUnit') {
+            steps { sh './mvnw test' }
+            post { always { junit allowEmptyResults: true, testResults: 'target/surefire-reports/*.xml' } }
+        }
+        stage('SonarQube') {
+            steps {
+                withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+                    sh './mvnw sonar:sonar -Dsonar.host.url=http://sonarqube:9000 -Dsonar.token=$SONAR_TOKEN -Dsonar.qualitygate.wait=true'
+                }
+            }
+        }
+        stage('Nexus') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'nexus-creds', usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
+                    sh './mvnw -s settings.xml deploy -DskipTests'
+                }
+            }
+        }
+    }
+}
