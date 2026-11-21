@@ -28,17 +28,26 @@ public class EventServicesImpl implements IEventServices{
 
     @Override
     public Participant addParticipant(Participant participant) {
-        return participantRepository.save(participant);
+        log.info("Ajout du participant : {} {}", participant.getNom(), participant.getPrenom());
+        Participant saved = participantRepository.save(participant);
+        log.debug("Participant enregistré, id = {}", saved.getIdPart());
+        return saved;
     }
 
     @Override
     public Event addAffectEvenParticipant(Event event, int idParticipant) {
+        log.info("Affectation de l'événement '{}' au participant {}", event.getDescription(), idParticipant);
         Participant participant = participantRepository.findById(idParticipant).orElse(null);
-        if(participant.getEvents() == null){
+        if (participant == null) {
+            log.error("Participant introuvable, id = {}", idParticipant);
+            throw new IllegalArgumentException("Participant introuvable : " + idParticipant);
+        }
+        if (participant.getEvents() == null) {
+            log.debug("Le participant {} n'a pas encore d'événements : création de la liste", idParticipant);
             Set<Event> events = new HashSet<>();
             events.add(event);
             participant.setEvents(events);
-        }else {
+        } else {
             participant.getEvents().add(event);
         }
         return eventRepository.save(event);
@@ -117,4 +126,5 @@ public class EventServicesImpl implements IEventServices{
         }
     }
 
+   
 }
