@@ -35,3 +35,10 @@ build/
 release.properties
 .env
 *.log
+
+
+terraform/.terraform/
+terraform/*.tfstate
+terraform/*.tfstate.*
+credentials
+*.pem
